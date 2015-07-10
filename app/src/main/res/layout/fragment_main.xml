@@ -8,6 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/gridview_movies_posters"
-        android:columnWidth="180px"
+        android:columnWidth="100dp"
         android:numColumns="auto_fit"/>
 </FrameLayout>

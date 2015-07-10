@@ -1,13 +1,15 @@
 package com.nanodegree.bpham.popularmovies;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import org.json.JSONArray;
@@ -33,7 +35,7 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         updateMovies();
     }
@@ -43,12 +45,21 @@ public class MainActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mMoviesGridAdapter = new MoviesGridAdapter(getActivity());
-        final GridView moviesPosterGridView = (GridView)rootView.findViewById(R.id.gridview_movies_posters);
+        final GridView moviesPosterGridView = (GridView) rootView.findViewById(R.id.gridview_movies_posters);
         moviesPosterGridView.setAdapter(mMoviesGridAdapter);
+        moviesPosterGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Movie movie = (Movie) mMoviesGridAdapter.getItem(position);
+                Intent detailIntent = new Intent(getActivity(), MovieDetailActivity.class);
+                detailIntent.putExtra("MOVIE", movie);
+                startActivity(detailIntent);
+            }
+        });
         return rootView;
     }
 
-    private void updateMovies(){
+    private void updateMovies() {
         FetchPopularMovieTask movieTask = new FetchPopularMovieTask();
         movieTask.execute();
     }
@@ -60,7 +71,7 @@ public class MainActivityFragment extends Fragment {
         protected void onPostExecute(Movie[] movies) {
             if (movies != null) {
                 mMoviesGridAdapter.clear();
-                for (Movie movie: movies) {
+                for (Movie movie : movies) {
                     mMoviesGridAdapter.addMovie(movie);
                 }
             }
@@ -139,7 +150,7 @@ public class MainActivityFragment extends Fragment {
             JSONObject popularMovieJson = new JSONObject(popularMovieJsonString);
             JSONArray moviesArray = popularMovieJson.getJSONArray(TMDB_RESULTS);
             Movie[] moviesList = new Movie[moviesArray.length()];
-            for (int i=0;i<moviesArray.length();i++){
+            for (int i = 0; i < moviesArray.length(); i++) {
                 JSONObject movieObject = moviesArray.getJSONObject(i);
                 moviesList[i] = new Movie(movieObject);
             }
