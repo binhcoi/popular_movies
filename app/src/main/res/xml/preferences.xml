@@ -9,5 +9,6 @@
         android:dialogTitle="@string/pref_sorting_label"
         android:entries="@array/pref_sorting_options"
         android:entryValues="@array/pref_sorting_values"
-        android:defaultValue="@string/pref_sorting_popularity" />
+        android:defaultValue="@string/pref_sorting_popularity"
+        android:summary="%s"/>
 </PreferenceScreen>
