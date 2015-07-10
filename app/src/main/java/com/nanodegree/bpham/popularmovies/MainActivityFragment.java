@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
 
 /**
@@ -18,6 +19,20 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        MoviesGridAdapter moviesGridAdapter = new MoviesGridAdapter(getActivity());
+        moviesGridAdapter.addMovie(new Movie());
+        moviesGridAdapter.addMovie(new Movie());
+        moviesGridAdapter.addMovie(new Movie());
+        moviesGridAdapter.addMovie(new Movie());
+        moviesGridAdapter.addMovie(new Movie());
+        moviesGridAdapter.addMovie(new Movie());
+        moviesGridAdapter.addMovie(new Movie());
+        moviesGridAdapter.addMovie(new Movie());
+        moviesGridAdapter.addMovie(new Movie());
+        moviesGridAdapter.addMovie(new Movie());
+        final GridView moviesPosterGridView = (GridView)rootView.findViewById(R.id.gridview_movies_posters);
+        moviesPosterGridView.setAdapter(moviesGridAdapter);
+        return rootView;
     }
 }
