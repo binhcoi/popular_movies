@@ -1,6 +1,7 @@
 package com.nanodegree.bpham.popularmovies;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,11 +44,22 @@ public class MoviesGridAdapter extends BaseAdapter {
         else{
             imageView = (ImageView)convertView;
         }
-        Picasso.with(mContext).load("http://i.imgur.com/DvpvklR.png").into(imageView);
+
+        final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/w185";
+        Uri builtUri = Uri.parse(POSTER_BASE_URL).buildUpon()
+                .appendEncodedPath(mMoviesList.get(position).getPoster())
+                .build();
+        Picasso.with(mContext).load(builtUri).into(imageView);
         return imageView;
     }
 
     public void addMovie(Movie movie) {
         mMoviesList.add(movie);
+        notifyDataSetChanged();
+    }
+
+    public void clear(){
+        mMoviesList.clear();
+        notifyDataSetChanged();
     }
 }
