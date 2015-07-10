@@ -27,16 +27,16 @@ public class MovieDetailActivityFragment extends Fragment {
 
         Movie movie = getActivity().getIntent().getParcelableExtra("MOVIE");
         if (movie != null) {
-            ((TextView) rootView.findViewById(R.id.textView_detail_title)).setText(movie.getTitle());
-            ((TextView) rootView.findViewById(R.id.textView_detail_release_date)).setText(movie.getReleaseDate());
-            ((TextView) rootView.findViewById(R.id.textView_detail_user_rating)).setText(Double.toString(movie.getVoteAverage()));
-            ((TextView) rootView.findViewById(R.id.textView_detail_synopsis)).setText(movie.getSynopsis());
             ImageView posterImageView = (ImageView) rootView.findViewById(R.id.imageView_detail_poster);
-            final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/w185";
+            final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/w342";
             Uri builtUri = Uri.parse(POSTER_BASE_URL).buildUpon()
                     .appendEncodedPath(movie.getPoster())
                     .build();
             Picasso.with(getActivity()).load(builtUri).into(posterImageView);
+            ((TextView) rootView.findViewById(R.id.textView_detail_title)).setText(movie.getTitle());
+            ((TextView) rootView.findViewById(R.id.textView_detail_release_date)).setText(movie.getReleaseDate());
+            ((TextView) rootView.findViewById(R.id.textView_detail_user_rating)).setText(Double.toString(movie.getVoteAverage()));
+            ((TextView) rootView.findViewById(R.id.textView_detail_synopsis)).setText(movie.getSynopsis());
         }
 
         return rootView;
