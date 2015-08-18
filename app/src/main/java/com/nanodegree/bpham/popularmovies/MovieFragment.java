@@ -30,11 +30,11 @@ import java.net.URL;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MovieFragment extends Fragment {
 
     private MoviesGridAdapter mMoviesGridAdapter;
 
-    public MainActivityFragment() {
+    public MovieFragment() {
     }
 
     @Override

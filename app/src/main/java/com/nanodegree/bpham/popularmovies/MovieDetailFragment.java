@@ -15,9 +15,9 @@ import com.squareup.picasso.Picasso;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MovieDetailActivityFragment extends Fragment {
+public class MovieDetailFragment extends Fragment {
 
-    public MovieDetailActivityFragment() {
+    public MovieDetailFragment() {
     }
 
     @Override
@@ -32,7 +32,8 @@ public class MovieDetailActivityFragment extends Fragment {
             Uri builtUri = Uri.parse(POSTER_BASE_URL).buildUpon()
                     .appendEncodedPath(movie.getPoster())
                     .build();
-            Picasso.with(getActivity()).load(builtUri).into(posterImageView);
+            if (builtUri != null)
+                Picasso.with(getActivity()).load(builtUri).into(posterImageView);
             ((TextView) rootView.findViewById(R.id.textView_detail_title)).setText(movie.getTitle());
             ((TextView) rootView.findViewById(R.id.textView_detail_release_date)).setText(movie.getReleaseDate());
             ((TextView) rootView.findViewById(R.id.textView_detail_user_rating)).setText(Double.toString(movie.getVoteAverage()));

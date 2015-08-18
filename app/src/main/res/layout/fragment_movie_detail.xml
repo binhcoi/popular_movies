@@ -10,7 +10,7 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        tools:context="com.nanodegree.bpham.popularmovies.MovieDetailActivityFragment">
+        tools:context="com.nanodegree.bpham.popularmovies.MovieDetailFragment">
 
         <ImageView
             android:id="@+id/imageView_detail_poster"
@@ -61,9 +61,9 @@
             android:layout_below="@+id/textView_detail_release_date"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginStart="@dimen/activity_vertical_margin"
-            android:paddingTop="@dimen/activity_horizontal_margin"
             android:layout_toEndOf="@+id/imageView_detail_poster"
             android:layout_toRightOf="@+id/imageView_detail_poster"
+            android:paddingTop="@dimen/activity_horizontal_margin"
             android:text="@string/detail_user_rating_label"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -74,9 +74,9 @@
             android:layout_below="@+id/textView_detail_user_rating_label"
             android:layout_marginLeft="@dimen/activity_vertical_margin"
             android:layout_marginStart="@dimen/activity_vertical_margin"
-            android:paddingTop="@dimen/activity_horizontal_margin"
             android:layout_toEndOf="@+id/imageView_detail_poster"
             android:layout_toRightOf="@+id/imageView_detail_poster"
+            android:paddingTop="@dimen/activity_horizontal_margin"
             android:text="@string/detail_user_rating_default"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 

@@ -13,43 +13,44 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 /**
- *  Created by Binh on 7/9/2015.
+ * Created by Binh on 7/9/2015.
+ *
  */
 public class MoviesGridAdapter extends BaseAdapter {
     private ArrayList<Movie> mMoviesList = new ArrayList<>();
     private Context mContext;
 
-    public MoviesGridAdapter(Context context){
+    public MoviesGridAdapter(Context context) {
         mContext = context;
     }
 
-    public int getCount(){
+    public int getCount() {
         return mMoviesList.size();
     }
 
-    public long getItemId(int position){
+    public long getItemId(int position) {
         return position;
     }
 
-    public Object getItem(int position){
+    public Object getItem(int position) {
         return mMoviesList.get(position);
     }
 
-    public View getView(int position,View convertView, ViewGroup parent){
+    public View getView(int position, View convertView, ViewGroup parent) {
         ImageView imageView;
-        if (convertView ==null){
+        if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(mContext);
-            imageView=(ImageView)inflater.inflate(R.layout.imageview_movie_poster,parent,false);
-        }
-        else{
-            imageView = (ImageView)convertView;
+            imageView = (ImageView) inflater.inflate(R.layout.imageview_movie_poster, parent, false);
+        } else {
+            imageView = (ImageView) convertView;
         }
 
         final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/w185";
         Uri builtUri = Uri.parse(POSTER_BASE_URL).buildUpon()
                 .appendEncodedPath(mMoviesList.get(position).getPoster())
                 .build();
-        Picasso.with(mContext).load(builtUri).into(imageView);
+        if (builtUri != null)
+            Picasso.with(mContext).load(builtUri).into(imageView);
         return imageView;
     }
 
@@ -58,7 +59,7 @@ public class MoviesGridAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void clear(){
+    public void clear() {
         mMoviesList.clear();
         notifyDataSetChanged();
     }
