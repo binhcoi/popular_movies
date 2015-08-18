@@ -1,7 +1,9 @@
 package com.nanodegree.bpham.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.nanodegree.bpham.popularmovies.data.MovieContract;
 import com.nanodegree.bpham.popularmovies.tmdbAPI.Discovery;
 import com.nanodegree.bpham.popularmovies.tmdbAPI.TMDBService;
 
@@ -42,15 +45,15 @@ public class MoviesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        mMoviesGridAdapter = new MoviesGridAdapter(getActivity());
+        mMoviesGridAdapter = new MoviesGridAdapter(getActivity(), null, 0);
         final GridView moviesPosterGridView = (GridView) rootView.findViewById(R.id.gridview_movies_posters);
         moviesPosterGridView.setAdapter(mMoviesGridAdapter);
         moviesPosterGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Movie movie = (Movie) mMoviesGridAdapter.getItem(position);
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
                 Intent detailIntent = new Intent(getActivity(), MovieDetailActivity.class);
-                detailIntent.putExtra("MOVIE", movie);
+                detailIntent.setData(MovieContract.MovieEntry.buildMovieUri(cursor.getLong(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TMDB_ID))));
                 startActivity(detailIntent);
             }
         });
@@ -68,12 +71,13 @@ public class MoviesFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Movie[] movies) {
-            if (movies != null) {
-                mMoviesGridAdapter.clear();
-                for (Movie movie : movies) {
-                    mMoviesGridAdapter.addMovie(movie);
-                }
-            }
+//            if (movies != null) {
+//                mMoviesGridAdapter.clear();
+//                for (Movie movie : movies) {
+//                    mMoviesGridAdapter.addMovie(movie);
+//                }
+//            }
+            mMoviesGridAdapter.swapCursor(getActivity().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null, null));
         }
 
         @Override
@@ -167,6 +171,15 @@ public class MoviesFragment extends Fragment {
         private Movie[] getPopularMovieFromDiscovery(Discovery discovery) {
             Movie[] moviesList = new Movie[discovery.getResults().size()];
             for (int i = 0; i < discovery.getResults().size(); i++) {
+                Movie movie = new Movie(discovery.getResults().get(i));
+                ContentValues values = new ContentValues();
+                values.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, movie.getId());
+                values.put(MovieContract.MovieEntry.COLUMN_TITLE, movie.getTitle());
+                values.put(MovieContract.MovieEntry.COLUMN_POSTER, movie.getPoster());
+                values.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, movie.getSynopsis());
+                values.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, movie.getVoteAverage());
+                values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
+                getActivity().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, values);
                 moviesList[i] = new Movie(discovery.getResults().get(i));
             }
             return moviesList;
