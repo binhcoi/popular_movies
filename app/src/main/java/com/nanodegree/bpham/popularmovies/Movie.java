@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.nanodegree.bpham.popularmovies.tmdbAPI.Discovery;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,8 +22,12 @@ public class Movie implements Parcelable {
     private double mVoteAverage;
     private String mReleaseDate;
 
-    public Movie(){
-
+    public Movie(Discovery.Result result){
+        mTitle = result.getTitle();
+        mPoster = result.getPosterPath();
+        mSynopsis = result.getOverview();
+        mVoteAverage = result.getVoteAverage();
+        mReleaseDate = result.getReleaseDate();
     }
 
     public Movie(JSONObject movieJson){
