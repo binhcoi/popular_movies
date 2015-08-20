@@ -77,7 +77,7 @@ public class MoviesFragment extends Fragment {
 //                    mMoviesGridAdapter.addMovie(movie);
 //                }
 //            }
-            mMoviesGridAdapter.swapCursor(getActivity().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null, null));
+            mMoviesGridAdapter.swapCursor(getActivity().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI, null, null, null, null));
         }
 
         @Override
@@ -97,75 +97,6 @@ public class MoviesFragment extends Fragment {
 
             Discovery discovery = service.discoverMovies(apiKey, sortBy);
             return getPopularMovieFromDiscovery(discovery);
-
-//            HttpURLConnection urlConnection = null;
-//            BufferedReader reader = null;
-//
-//            String movieJsonString = null;
-//            String apiKey = "cba9c860b69488321984a8c81ce0e1f3";
-//            String sortBy = "";
-//            if (params[0].equals(getString(R.string.pref_sorting_popularity))){
-//                sortBy = "popularity.desc";
-//            }else if (params[0].equals(getString(R.string.pref_sorting_rating))){
-//                sortBy = "vote_average.desc";
-//            }
-//
-//            try {
-//                final String POPULAR_MOVIES_BASE_URL = "http://api.themoviedb.org/3/discover/movie?";
-//                final String SORT_BY_PARAM = "sort_by";
-//                final String API_KEY_PARAM = "api_key";
-//
-//                Uri builtUri = Uri.parse(POPULAR_MOVIES_BASE_URL).buildUpon()
-//                        .appendQueryParameter(SORT_BY_PARAM, sortBy)
-//                        .appendQueryParameter(API_KEY_PARAM, apiKey)
-//                        .build();
-//
-//                URL url = new URL(builtUri.toString());
-//
-//                // Create the request, and open the connection
-//                urlConnection = (HttpURLConnection) url.openConnection();
-//                urlConnection.setRequestMethod("GET");
-//                urlConnection.connect();
-//
-//                // Read the input stream into a String
-//                InputStream inputStream = urlConnection.getInputStream();
-//                StringBuilder buffer = new StringBuilder();
-//                if (inputStream == null) {
-//                    return null;
-//                }
-//                reader = new BufferedReader(new InputStreamReader(inputStream));
-//
-//                String line;
-//                while ((line = reader.readLine()) != null) {
-//                    buffer.append(line).append("\n");
-//                }
-//
-//                if (buffer.length() == 0) {
-//                    return null;
-//                }
-//                movieJsonString = buffer.toString();
-//            } catch (IOException e) {
-//                Log.e(LOG_TAG, "Error:", e);
-//                return null;
-//            } finally {
-//                if (urlConnection != null) {
-//                    urlConnection.disconnect();
-//                }
-//                if (reader != null) {
-//                    try {
-//                        reader.close();
-//                    } catch (final IOException e) {
-//                        Log.e(LOG_TAG, "Error closing stream:`", e);
-//                    }
-//                }
-//            }
-//
-//            try {
-//                return getPopularMovieFromJson(movieJsonString);
-//            } catch (JSONException e) {
-//                Log.e(LOG_TAG, "Error ", e);
-//            }
-//            return null;
         }
 
         private Movie[] getPopularMovieFromDiscovery(Discovery discovery) {
