@@ -20,13 +20,15 @@ public class MovieContract {
 
     public static final class ReviewEntry implements BaseColumns {
 
-//        public static final Uri CONTENT_URI =
-//                BASE_CONTENT_URI.buildUpon().appendPath(PATH_LOCATION).build();
-//
-//        public static final String CONTENT_TYPE =
-//                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
-//        public static final String CONTENT_ITEM_TYPE =
-//                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_LOCATION;
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_REVIEW).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
+
+        public static final String COLUMN_TMDB_ID = "tmdb_id";
 
         public static final String TABLE_NAME = "reviews";
 
@@ -36,13 +38,23 @@ public class MovieContract {
 
         public static final String COLUMN_CONTENT = "content";
 
-//        public static Uri buildLocationUri(long id) {
-//            return ContentUris.withAppendedId(CONTENT_URI, id);
-//        }
+        public static Uri buildReviewUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 
     public static final class TrailerEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRAILER).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;
+
         public static final String TABLE_NAME = "trailers";
+
+        public static final String COLUMN_TMDB_ID = "tmdb_id";
 
         public static final String COLUMN_MOVIE_KEY = "movie_id";
 
@@ -51,6 +63,10 @@ public class MovieContract {
         public static final String COLUMN_NAME = "name";
 
         public static final String COLUMN_SITE = "site";
+
+        public static Uri buildTrailerUri(long id){
+            return ContentUris.withAppendedId(CONTENT_URI,id);
+        }
     }
 
     public static final class MovieEntry implements BaseColumns{
@@ -75,6 +91,10 @@ public class MovieContract {
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
 
         public static final String COLUMN_RELEASE_DATE = "release_date";
+
+        public static final String COLUMN_FAVORITE = "is_favorite";
+
+        public static final String COLUMN_POSITION = "position";
 
         public static Uri buildMovieUri(long id){
             return ContentUris.withAppendedId(CONTENT_URI,id);

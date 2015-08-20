@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Popular Movies</string>
     <string name="content_authority">com.nanodegree.bpham.popularmovies</string>
+    <string name="sync_account_type">popularmovies.bpham.nanodegree.com</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_movie_detail">Details</string>
     <string name="detail_title_default">TITLE</string>
