@@ -87,7 +87,7 @@ public class MoviesFragment extends Fragment {
                     .setEndpoint(BASE_URL)
                     .build();
             TMDBService service = restAdapter.create(TMDBService.class);
-            String apiKey = "cba9c860b69488321984a8c81ce0e1f3";
+            String apiKey = "";
             String sortBy = "";
             if (params[0].equals(getString(R.string.pref_sorting_popularity))) {
                 sortBy = "popularity.desc";
