@@ -2,6 +2,7 @@ package com.nanodegree.bpham.popularmovies;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -62,9 +63,8 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                Intent detailIntent = new Intent(getActivity(), MovieDetailActivity.class);
-                detailIntent.setData(MovieContract.MovieEntry.buildMovieUri(cursor.getLong(COL_TMDB_ID)));
-                startActivity(detailIntent);
+                ((Callback) getActivity()).onItemSelected(
+                        MovieContract.MovieEntry.buildMovieUri(cursor.getLong(COL_TMDB_ID)));
             }
         });
         return rootView;
@@ -101,5 +101,9 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mMoviesGridAdapter.swapCursor(null);
+    }
+
+    public interface Callback {
+        void onItemSelected(Uri movieUri);
     }
 }

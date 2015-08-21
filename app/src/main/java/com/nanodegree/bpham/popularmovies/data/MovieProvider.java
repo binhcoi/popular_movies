@@ -7,8 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
-import com.nanodegree.bpham.popularmovies.Movie;
-
 /**
  * Created by binh on 8/17/15.
  *

@@ -18,6 +18,7 @@
     <string name="pref_sorting_rating">rating</string>
     <string name="pref_sorting_label">Sort by</string>
     <string name="pref_sorting_key">sorting</string>
+    <string name="action_share">Share</string>
 
     <string-array name="pref_sorting_options">
         <item>@string/pref_sorting_label_popularity</item>
