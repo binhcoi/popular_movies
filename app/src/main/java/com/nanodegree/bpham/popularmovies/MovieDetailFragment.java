@@ -8,8 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.view.MenuCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,13 +18,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.support.v7.widget.ShareActionProvider;
 import android.widget.TextView;
 
 import com.nanodegree.bpham.popularmovies.data.MovieContract;
 import com.squareup.picasso.Picasso;
-
-import java.util.zip.Inflater;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -82,6 +79,10 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         }
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, rootView);
+        if (mUri != null) {
+            getLoaderManager().restartLoader(TRAILERS_LOADER, null, this);
+            getLoaderManager().restartLoader(REVIEWS_LOADER, null, this);
+        }
         return rootView;
     }
 
@@ -92,11 +93,13 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     }
 
     public void onSortByChanged() {
-        mUri = null;
-        mShareUri = null;
-        getLoaderManager().restartLoader(DETAILS_LOADER, null, this);
-        getLoaderManager().restartLoader(TRAILERS_LOADER, null, this);
-        getLoaderManager().restartLoader(REVIEWS_LOADER, null, this);
+        if (mUri != null) {
+            mUri = null;
+            mShareUri = null;
+            getLoaderManager().restartLoader(DETAILS_LOADER, null, this);
+            getLoaderManager().restartLoader(TRAILERS_LOADER, null, this);
+            getLoaderManager().restartLoader(REVIEWS_LOADER, null, this);
+        }
     }
 
     @Override
@@ -164,6 +167,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                         cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_SYNOPSIS)));
                 break;
             case TRAILERS_LOADER:
+                trailersView.removeAllViews();
                 while (cursor.moveToNext()) {
                     View view = LayoutInflater.from(getActivity()).inflate(R.layout.list_item_trailer, null);
                     final Uri uri = Uri.parse(BASE_TRAILER_URL).
@@ -192,6 +196,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                 }
                 break;
             case REVIEWS_LOADER:
+                reviewsView.removeAllViews();
                 while (cursor.moveToNext()) {
                     View view = LayoutInflater.from(getActivity()).inflate(R.layout.list_item_review, null);
                     ReviewViewHolder holder = new ReviewViewHolder(view);
@@ -212,9 +217,13 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
                 break;
             case TRAILERS_LOADER:
+                if (trailersView != null)
+                    trailersView.removeAllViews();
                 mShareUri = null;
                 break;
             case REVIEWS_LOADER:
+                if (reviewsView != null)
+                    reviewsView.removeAllViews();
                 break;
         }
     }

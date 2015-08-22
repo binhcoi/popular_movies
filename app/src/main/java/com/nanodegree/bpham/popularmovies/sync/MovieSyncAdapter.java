@@ -10,21 +10,14 @@ import android.content.Context;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.nanodegree.bpham.popularmovies.R;
 import com.nanodegree.bpham.popularmovies.Utility;
 import com.nanodegree.bpham.popularmovies.data.MovieContract;
-import com.nanodegree.bpham.popularmovies.tmdbAPI.Discovery;
-import com.nanodegree.bpham.popularmovies.tmdbAPI.Reviews;
-import com.nanodegree.bpham.popularmovies.tmdbAPI.TMDBService;
-import com.nanodegree.bpham.popularmovies.tmdbAPI.Trailers;
-
-import java.util.Vector;
-
-import retrofit.RestAdapter;
+import com.nanodegree.bpham.popularmovies.tmdbAPI.TMDBUtility;
 
 /**
  * Created by binh on 8/19/15.
@@ -34,12 +27,8 @@ import retrofit.RestAdapter;
 public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     private final String LOG_TAG = MovieSyncAdapter.class.getSimpleName();
 
-    private static final int SYNC_HOURS = 4;
-    private static final int SYNC_INTERVAL = 60 * 60 * SYNC_HOURS;
-    private static final int SYNC_FLEXTIME = SYNC_INTERVAL / SYNC_HOURS;
-
-    private final String BASE_URL = "http://api.themoviedb.org/3";
-    private final String API_KEY = "";
+    public static final int SYNC_INTERVAL = 60 * 180; //3 hours
+    public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
     public MovieSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -116,20 +105,14 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                               ContentProviderClient client, SyncResult syncResult) {
         Context context = getContext();
         ContentResolver resolver = context.getContentResolver();
-        // get movies
-        String sortPref = Utility.getPreferenceSortBy(context);
 
-        RestAdapter restAdapter = new RestAdapter.Builder()
-                .setEndpoint(BASE_URL)
-                .build();
-        TMDBService service = restAdapter.create(TMDBService.class);
+        String sortPref = Utility.getPreferenceSortBy(context);
         String sortBy = "";
         if (sortPref.equals(context.getString(R.string.pref_sorting_popularity))) {
             sortBy = "popularity.desc";
         } else if (sortPref.equals(context.getString(R.string.pref_sorting_rating))) {
             sortBy = "vote_average.desc";
         }
-        Discovery discovery = service.discoverMovies(API_KEY, sortBy);
 
         ContentValues updateValues = new ContentValues();
         updateValues.put(MovieContract.MovieEntry.COLUMN_POSITION, -1);
@@ -137,88 +120,9 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                 updateValues,
                 null,
                 null);
-        insertMovieFromDiscovery(service, discovery);
 
-        //remove movies that is not needed (position = -1 and not favorite)
-        String selection = MovieContract.MovieEntry.COLUMN_FAVORITE + "=0 AND " +
-                MovieContract.MovieEntry.COLUMN_POSITION + "=-1";
-        String[] projection = {MovieContract.MovieEntry.COLUMN_TMDB_ID};
 
-        Cursor moviesToDelete = resolver.query(MovieContract.MovieEntry.CONTENT_URI,
-                projection,
-                selection,
-                null,
-                null);
-
-        resolver.delete(MovieContract.MovieEntry.CONTENT_URI,
-                selection,
-                null);
-        while (moviesToDelete.moveToNext()) {
-            resolver.delete(MovieContract.TrailerEntry.CONTENT_URI,
-                    MovieContract.TrailerEntry.COLUMN_MOVIE_KEY + "=?",
-                    new String[]{moviesToDelete.getString(0)});
-            resolver.delete(MovieContract.ReviewEntry.CONTENT_URI,
-                    MovieContract.ReviewEntry.COLUMN_MOVIE_KEY + "=?",
-                    new String[]{moviesToDelete.getString(0)});
-        }
-    }
-
-    private void insertMovieFromDiscovery(TMDBService service, Discovery discovery) {
-        for (int i = 0; i < discovery.getResults().size(); i++) {
-            Discovery.Result result = discovery.getResults().get(i);
-            if (result.getPosterPath()==null)
-                continue;
-            ContentValues values = new ContentValues();
-            values.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, result.getId());
-            values.put(MovieContract.MovieEntry.COLUMN_TITLE, result.getTitle());
-            values.put(MovieContract.MovieEntry.COLUMN_POSTER, result.getPosterPath());
-            values.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, result.getOverview());
-            values.put(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE, result.getVoteAverage());
-            values.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, result.getReleaseDate());
-            values.put(MovieContract.MovieEntry.COLUMN_POSITION, i);
-            Uri uri = getContext().getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI,
-                    values);
-            int id = MovieContract.MovieEntry.getIdFromUri(uri);
-            getMoviesTrailers(service, id);
-            getMoviesReviews(service, id);
-        }
-    }
-
-    private void getMoviesTrailers(TMDBService service, int movieId) {
-        Trailers trailers = service.getTrailers(movieId, API_KEY);
-        Vector<ContentValues> valuesVector = new Vector<>(trailers.getResults().size());
-        for (int i = 0; i < trailers.getResults().size(); i++) {
-            Trailers.Result result = trailers.getResults().get(i);
-            ContentValues values = new ContentValues();
-            values.put(MovieContract.TrailerEntry.COLUMN_TMDB_ID, result.getId());
-            values.put(MovieContract.TrailerEntry.COLUMN_MOVIE_KEY, movieId);
-            values.put(MovieContract.TrailerEntry.COLUMN_KEY, result.getKey());
-            values.put(MovieContract.TrailerEntry.COLUMN_NAME, result.getName());
-            values.put(MovieContract.TrailerEntry.COLUMN_SITE, result.getSite());
-
-            valuesVector.add(values);
-        }
-        ContentValues[] values = new ContentValues[valuesVector.size()];
-        valuesVector.toArray(values);
-        getContext().getContentResolver().bulkInsert(MovieContract.TrailerEntry.CONTENT_URI,
-                values);
-    }
-
-    private void getMoviesReviews(TMDBService service, int movieId) {
-        Reviews reviews = service.getReviews(movieId, API_KEY);
-        Vector<ContentValues> valuesVector = new Vector<>(reviews.getResults().size());
-        for (int i = 0; i < reviews.getResults().size(); i++) {
-            Reviews.Result result = reviews.getResults().get(i);
-            ContentValues values = new ContentValues();
-            values.put(MovieContract.ReviewEntry.COLUMN_TMDB_ID, result.getId());
-            values.put(MovieContract.ReviewEntry.COLUMN_MOVIE_KEY, movieId);
-            values.put(MovieContract.ReviewEntry.COLUMN_AUTHOR, result.getAuthor());
-            values.put(MovieContract.ReviewEntry.COLUMN_CONTENT, result.getContent());
-            valuesVector.add(values);
-        }
-        ContentValues[] values = new ContentValues[valuesVector.size()];
-        valuesVector.toArray(values);
-        getContext().getContentResolver().bulkInsert(MovieContract.ReviewEntry.CONTENT_URI,
-                values);
+        TMDBUtility tmdbUtility = new TMDBUtility(context);
+        tmdbUtility.fetchMovies(sortBy);
     }
 }

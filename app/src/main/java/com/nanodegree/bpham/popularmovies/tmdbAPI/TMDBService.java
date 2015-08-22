@@ -1,5 +1,6 @@
 package com.nanodegree.bpham.popularmovies.tmdbAPI;
 
+import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -10,12 +11,11 @@ import retrofit.http.Query;
  */
 public interface TMDBService {
     @GET("/discover/movie")
-    Discovery discoverMovies(@Query("api_key") String api_key, @Query("sort_by") String sortBy);
+    void discoverMovies(@Query("api_key") String api_key, @Query("sort_by") String sortBy, Callback<Discovery> callback);
 
     @GET("/movie/{id}/videos")
-    Trailers getTrailers(@Path("id") int id, @Query("api_key") String api_key);
+    void getTrailers(@Path("id") int id, @Query("api_key") String api_key, Callback<Trailers> callback);
 
     @GET("/movie/{id}/reviews")
-    Reviews getReviews(@Path("id") int id, @Query("api_key") String api_key);
-
+    void getReviews(@Path("id") int id, @Query("api_key") String api_key, Callback<Reviews> callback);
 }
