@@ -36,6 +36,8 @@ public class TMDBUtility {
     }
 
     public void fetchMovies(String sortBy) {
+        if (sortBy == null || sortBy.isEmpty())
+            return;
         service.discoverMovies(API_KEY, sortBy, new Callback<Discovery>() {
             @Override
             public void success(Discovery discovery, Response response) {
@@ -85,7 +87,7 @@ public class TMDBUtility {
         int[] idList = new int[discovery.getResults().size()];
         for (int i = 0; i < discovery.getResults().size(); i++) {
             Discovery.Result result = discovery.getResults().get(i);
-            if (result.getPosterPath() == null)
+            if (result.getPosterPath() == null || result.getTitle() == null)
                 continue;
             ContentValues values = new ContentValues();
             values.put(MovieContract.MovieEntry.COLUMN_TMDB_ID, result.getId());
@@ -108,6 +110,9 @@ public class TMDBUtility {
         Vector<ContentValues> valuesVector = new Vector<>(trailers.getResults().size());
         for (int i = 0; i < trailers.getResults().size(); i++) {
             Trailers.Result result = trailers.getResults().get(i);
+            if (result.getId() == null || result.getKey() == null ||
+                    result.getName() == null || result.getSite() == null)
+                continue;
             ContentValues values = new ContentValues();
             values.put(MovieContract.TrailerEntry.COLUMN_TMDB_ID, result.getId());
             values.put(MovieContract.TrailerEntry.COLUMN_MOVIE_KEY, movieId);
@@ -127,6 +132,9 @@ public class TMDBUtility {
         Vector<ContentValues> valuesVector = new Vector<>(reviews.getResults().size());
         for (int i = 0; i < reviews.getResults().size(); i++) {
             Reviews.Result result = reviews.getResults().get(i);
+            if (result.getId() == null || result.getAuthor() == null ||
+                    result.getContent() == null)
+                continue;
             ContentValues values = new ContentValues();
             values.put(MovieContract.ReviewEntry.COLUMN_TMDB_ID, result.getId());
             values.put(MovieContract.ReviewEntry.COLUMN_MOVIE_KEY, movieId);
@@ -148,6 +156,7 @@ public class TMDBUtility {
             for (int id : idList) {
                 fetchReviews(id);
                 fetchTrailers(id);
+                // TMDB API have a limit of 40 requests/10 sec
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {

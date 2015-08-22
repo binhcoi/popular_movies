@@ -1,5 +1,6 @@
 package com.nanodegree.bpham.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -45,6 +47,10 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
     LinearLayout trailersView;
     @Bind(R.id.linearlayout_reviews)
     LinearLayout reviewsView;
+    @Bind(R.id.linearlayout_details)
+    LinearLayout detailsView;
+    @Bind(R.id.detail_favorite_button)
+    Button favoriteButton;
 
     static final String DETAIL_URI = "URI";
 
@@ -80,8 +86,11 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
         View rootView = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, rootView);
         if (mUri != null) {
-            getLoaderManager().restartLoader(TRAILERS_LOADER, null, this);
-            getLoaderManager().restartLoader(REVIEWS_LOADER, null, this);
+            //reset loader for trailers and reviews in case of screen rotation
+            if (getLoaderManager().getLoader(TRAILERS_LOADER) != null)
+                getLoaderManager().restartLoader(TRAILERS_LOADER, null, this);
+            if (getLoaderManager().getLoader(TRAILERS_LOADER) != null)
+                getLoaderManager().restartLoader(REVIEWS_LOADER, null, this);
         }
         return rootView;
     }
@@ -94,6 +103,7 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
 
     public void onSortByChanged() {
         if (mUri != null) {
+            detailsView.setVisibility(View.INVISIBLE);
             mUri = null;
             mShareUri = null;
             getLoaderManager().restartLoader(DETAILS_LOADER, null, this);
@@ -161,10 +171,32 @@ public class MovieDetailFragment extends Fragment implements LoaderManager.Loade
                         cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TITLE)));
                 releaseDateView.setText(cursor.getString(
                         cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_RELEASE_DATE)));
-                userRatingView.setText(cursor.getString(
-                        cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE)));
+                userRatingView.setText(getActivity().getString(R.string.user_rating_value,
+                        cursor.getString(
+                        cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE))));
                 synopsisView.setText(cursor.getString(
                         cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_SYNOPSIS)));
+                final ContentValues updateValues = new ContentValues();
+                final String id = cursor.getString(
+                        cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_TMDB_ID));
+                if (cursor.getInt(
+                        cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_FAVORITE)) == 0) {
+                    favoriteButton.setText(getActivity().getString(R.string.add_favorite_button));
+                    updateValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 1);
+                } else {
+                    favoriteButton.setText(getActivity().getString(R.string.remove_favorite_button));
+                    updateValues.put(MovieContract.MovieEntry.COLUMN_FAVORITE, 0);
+                }
+                favoriteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getActivity().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
+                                updateValues,
+                                MovieContract.MovieEntry.COLUMN_TMDB_ID + "=" + id,
+                                null);
+                    }
+                });
+                detailsView.setVisibility(View.VISIBLE);
                 break;
             case TRAILERS_LOADER:
                 trailersView.removeAllViews();
