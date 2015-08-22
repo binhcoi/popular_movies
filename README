@@ -1,0 +1,2 @@
+API key has been removed from the project. You can insert your API key to tmdbAPI/TMDBUtility.java
+line 27     private final String API_KEY = "";
